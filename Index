@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Label Pengiriman</title>
+    <style>
+        /* --- Gaya untuk Tampilan Aplikasi di Layar --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        input[type="text"], textarea, input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        textarea {
+            resize: vertical;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .preview-title {
+            margin-top: 40px;
+            font-weight: bold;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        /* --- DESAIN LABEL (Sesuai Ukuran Kertas Nota 5x5 cm) --- */
+        .print-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        /* Desain kotak presisi untuk label */
+        .label-box {
+            width: 50mm;
+            height: 50mm;
+            border: 1px solid #000;
+            box-sizing: border-box;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+
+        .section {
+            border-bottom: 1px solid #000;
+            padding: 4px 6px;
+            text-align: center;
+        }
+
+        .title-header {
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            background-color: #f5f5f5;
+            letter-spacing: 0.5px;
+            padding: 2px 0;
+        }
+
+        .address-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 8px;
+            line-height: 1.2;
+            padding: 4px;
+            font-weight: 500;
+        }
+        .address-content .nama {
+            font-weight: bold;
+            font-size: 9px;
+            margin-bottom: 2px;
+        }
+
+        .invoice-content {
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            padding: 4px 0;
+        }
+
+        .catatan-content {
+            font-size: 7px;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 3px 6px;
+        }
+        .catatan-content span {
+            font-weight: bold;
+        }
+
+        .box-counter-row {
+            display: flex;
+            border-bottom: none;
+            padding: 0;
+            height: 14mm;
+        }
+        .box-label {
+            width: 30%;
+            font-size: 8px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid #000;
+            text-transform: uppercase;
+            background-color: #f5f5f5;
+        }
+        .box-number {
+            width: 70%;
+            font-size: 16px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- PENGATURAN KHUSUS CETAK/PRINT --- */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-area, .print-area * {
+                visibility: visible;
+            }
+            .print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                margin: 0;
+                padding: 0;
+                gap: 0;
+            }
+            .label-box {
+                margin: 0;
+                page-break-after: always; /* Membuat halaman baru tiap box */
+                border: 1px solid #000; /* Memastikan border tetap tercetak */
+            }
+            /* Menghilangkan margin browser saat print */
+            @page {
+                size: 50mm 50mm;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Form Label Pengiriman (5x5 cm)</h2>
+    
+    <div class="form-group">
+        <label for="input-alamat">Alamat Pengiriman :</label>
+        <textarea id="input-alamat" rows="4" placeholder="Contoh: Ibu Susi&#10;0129005201&#10;Jl. M. Hasanudin No. 136..."></textarea>
+    </div>
+    
+    <div class="form-group">
+        <label for="input-invoice">Invoice :</label>
+        <input type="text" id="input-invoice" placeholder="Contoh: ABCDE">
+    </div>
+    
+    <div class="form-group">
+        <label for="input-catatan">Catatan Tambahan :</label>
+        <input type="text" id="input-catatan" placeholder="Contoh: Darat/tagih tujuan">
+    </div>
+    
+    <div class="form-group">
+        <label for="input-box">Jumlah Box :</label>
+        <input type="number" id="input-box" min="1" value="1">
+    </div>
+    
+    <button onclick="generateDanCetak()">Generate & Cetak Label</button>
+    
+    <div class="preview-title">Live Preview (Hasil):</div>
+    <div class="print-area" id="print-area">
+        </div>
+</div>
+
+<script>
+    const inputAlamat = document.getElementById('input-alamat');
+    const inputInvoice = document.getElementById('input-invoice');
+    const inputCatatan = document.getElementById('input-catatan');
+    const inputBox = document.getElementById('input-box');
+    const printArea = document.getElementById('print-area');
+
+    // Fungsi untuk memperbarui preview secara real-time
+    function updatePreview() {
+        printArea.innerHTML = '';
+        
+        const alamatRaw = inputAlamat.value || 'Nama Penerima\nNo Telp\nAlamat Lengkap';
+        const invoice = inputInvoice.value || 'INVOICE';
+        const catatan = inputCatatan.value || '-';
+        const totalBox = parseInt(inputBox.value) || 1;
+
+        // Memisahkan baris alamat agar baris pertama otomatis menjadi Bold (Nama)
+        const alamatBaris = alamatRaw.split('\n');
+        let alamatHTML = '';
+        alamatBaris.forEach((baris, index) => {
+            if(index === 0) {
+                alamatHTML += `<div class="nama">${baris}</div>`;
+            } else {
+                alamatHTML += `<div>${baris}</div>`;
+            }
+        });
+
+        // Loop untuk membuat label sebanyak jumlah box
+        for (let i = 1; i <= totalBox; i++) {
+            const label = document.createElement('div');
+            label.className = 'label-box';
+            
+            label.innerHTML = `
+                <div class="section title-header">Alamat</div>
+                <div class="address-content">
+                    ${alamatHTML}
+                </div>
+                <div class="section title-header">Invoice</div>
+                <div class="section invoice-content">${invoice}</div>
+                <div class="section catatan-content"><span>Catatan:</span> ${catatan}</div>
+                <div class="section box-counter-row">
+                    <div class="box-label">No Box</div>
+                    <div class="box-number">${i} OF ${totalBox}</div>
+                </div>
+            `;
+            
+            printArea.appendChild(label);
+        }
+    }
+
+    // Jalankan cetak browser setelah generate
+    function generateDanCetak() {
+        updatePreview();
+        window.print();
+    }
+
+    // Jalankan preview otomatis saat user mengetik
+    inputAlamat.addEventListener('input', updatePreview);
+    inputInvoice.addEventListener('input', updatePreview);
+    inputCatatan.addEventListener('input', updatePreview);
+    inputBox.addEventListener('input', updatePreview);
+
+    // Inisialisasi preview awal saat web dibuka
+    updatePreview();
+</script>
+
+</body>
+</html>
